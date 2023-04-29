@@ -1,3 +1,9 @@
+<?php
+
+require('functions.php');
+loadEnv('.env');
+?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>

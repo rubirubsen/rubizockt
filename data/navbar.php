@@ -4,4 +4,5 @@
     | <a href="blog.php">Rubi Bloggt</a> 
     | <a href="https://pure4u.de/impressum/" target="_blank">Impressum</a> 
     | <a href="toolboard.php">Toolboard</a>
+    | <a href="apis.php">API's</a>
 </div>
