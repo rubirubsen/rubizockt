@@ -1,16 +1,8 @@
 <?php
-$datum = date("d.m.Y");
-$uhrzeit = date("H:i");
-$txtDatumZeit = $datum." - ".$uhrzeit." Uhr";
+$datum = date("d.m.Y",strtotime('+2 hours'));
+$uhrzeit = date("H:i",strtotime('+2 hours'));
 ?>
-
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <title>RubiZockt bald wieder!</title>
-  <link rel="stylesheet" href="css/rubStyle.css">
-</head>
-<body style="background:darkgrey">
 <?php include('navbar.php'); ?>
 <br>
-Es ist der <?php echo $datum ?> und es ist <?php echo $uhrzeit."Uhr." ?>
+Es ist der <?php echo $datum ?> und es ist <?php echo $uhrzeit." Uhr." ?>
+<?php include('footer.php'); ?>

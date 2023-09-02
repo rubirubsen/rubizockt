@@ -1,72 +1,119 @@
 <?php
+require('creds.php');
 
-$datum = date("d.m.Y");
-$uhrzeit = date("H:i");
+// Create connection
+/** @var string $servername */
+/** @var string $username */
+/** @var string $password */
+/** @var string $dbname */
+$conn = sqlsrv_connect($servername, array("UID"=>$username, "PWD"=>$password, "Database"=>$dbname));
 
-$txtDatumZeit = $datum." - ".$uhrzeit." Uhr";
+// Check connection
+if ($conn === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Execute query
+$query = "SELECT po.[id]
+      ,[txtTitel]
+      ,[txtContent]
+      ,[dateErstellt_am]
+      ,po.arrTags
+	  ,ml.txtLinkUrl
+      ,ml.txtMediaType
+  FROM [dbo].[tblPostings] PO
+  LEFT JOIN [dbo].tblMediaLinks ML ON ml.intPostingId = po.id
+  ORDER BY po.[id] DESC";
+$result = sqlsrv_query($conn, $query);
+
+// Loop through results
+$arrPostings = [];
+$i = 0;
+while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+    $arrPostings[$i]['titel'] =  $row['txtTitel'];
+    $arrPostings[$i]['erstellt'] = $row['dateErstellt_am'];
+    $arrPostings[$i]['content'] =  $row['txtContent'];
+    $arrPostings[$i]['imgUrl'] = $row['txtLinkUrl'];
+    $arrPostings[$i]['mediaType'] = $row['txtMediaType'];
+    $arrPostings[$i]['arrTags'] = $row['arrTags'];
+    $i++;
+}
 
 
+// Free statement and close connection
+sqlsrv_free_stmt($result);
+sqlsrv_close($conn);
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <title>RubiZockt bald wieder!</title>
-  <link rel="stylesheet" href="css/rubStyle.css">
-</head>
-<body style="background:darkgrey">
-
 <?php include('navbar.php'); ?>
+<div class="fond">
+    <span class="s1"></span>
+    <span class="s2"></span>
+</div>
+<?php foreach($arrPostings as $key => $postingDetail): ?>
+<?php
+$datumTag = $postingDetail['erstellt']->format('d');
+$datumMonat = $postingDetail['erstellt']->format('F');
+$datumJahr = $postingDetail['erstellt']->format('Y');
+$contentCode = '<div class="blogEntryFull" id="bE_'.$key.'"><div class="closeEntry" id="cE_'.$key.'"><a href="#">X</a></div>';
+$contentCode .= $postingDetail["content"].'</div>';
+//?>
 
-<div class="blogContainer">
+<div class="card">
+    <?php echo $contentCode; ?>
+    <div class="thumbnail">
 
-<div class="blogEntry">
-    <div class="blogHeader">Design Vorlage</div>
-    <div class="blogTime"><?php echo $txtDatumZeit ?></div>
-    <hr>
-    <div class="entryBody">
-        
-        -Lorem Ipsum-
+    <?php if($postingDetail['mediaType'] === 'video'):?>
+        <video controls width='530px'><source src="<?php echo $postingDetail['imgUrl'] ?>" type='video/webm'>
+    <?php else: ?>
+        <img class="left" src="<?php echo $postingDetail["imgUrl"]?>">
+    <?php endif; ?>
+    </div>
+    <div class="tags" style="padding-top: 33.5em;position: absolute;z-index: inherit;width: fit-content;color: darkgrey;padding-left: 0.8em;font-size: 0.8em;">
+        TAGS COMING HERE SOON
+    </div>
+    <div class="right">
+        <h1><?php echo $postingDetail['titel'] ?></h1>
+        <div class="author">
+            <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/d30781cf-732a-4b91-8249-874654283e52-profile_image-70x70.png">
+            <h2>RubiZockt</h2>
+        </div>
+        <div class="separator"></div>
+        <div class="BlogEntryPreview" style="max-height: 230px; overflow: hidden">
+            <?php echo $postingDetail['content'] ?>
+        </div>
 
-        <p>
-        Bartok charlatan master boomerang hatter alfred nigma shrike clock temblor. Diamond the gargoyle killer. Raatko snake solomon blake chimera gearhead. Fright poison shrike amanda ragdoll kobra firefly tumbler diamond young blink. Toymaker diamond clench blink atomic diamond luthor. Checkmate grey kobra phantom ali scarecrow rupert ghul shadow. Abbott hood pit robin alfred grayson jester shiva carmine rose chill hammer. Caird shiva barrow gotham america spoiler! League birds echo jason doom quinn manor smoke tumbler jason abbott dent. Clench lillian fox atkins bruce black batcave zeus tim temblor maxie zeus rupert. Lazarus aquaman abattoir zucco mad harlequin. Bennett bullock diamond.
-        </p>
-        <p>
-        Supergirl raatko scorn charlatan clayface maxie grundy jason young alfred rhino wing oswald. Smoke doom gotham gleeson atom harvey blink wing gleeson temblor chase vicki. Moth basil arrow fairchild. Damian todd scorn batarang charlatan batmobile. Huntress spectre jester knight vale ragman. Snake scarecrow echo lucius blake bat atom oracle. Chill gleeson birds bennett carmine hammer collector huntress barbara. Elongated poison blink dent vale bennett. Tim chimera, vicki ragdoll. Arrow drake face barrow moth hugo tally damian justice harley. Cain bruce zeus hammer hush charlatan. A outsider diamond a dent hatter jester caird.
-        </p>
-        <p>
-        Batgirl joe batarang vicki bruce, manor doom riddler batmobile catwoman blake poison canary. Jason strange quinn blue. Diamond scarecrow hammer cobblepot azrael calendar a kane thorne batarang copperhead red. Maroni temblor thorne maroni, batman nigma. A lantern moth charlatan shadow abdullah clayface prey carmine copperhead knight phantom. Collector helena collector abbott vicki dent nyssa edward barrow. Killer firefly harley lynx. Superman atomic jim checkmate wayne prey blue outsider martha kobra pit. Cypher america ventriloquist batgirl aiko bullock deadshot gotham kobra shiva master hangman. Todd phantom.
-        </p>
-        <p>
-        Atomic gleeson diamond face falcone calendar, flash batmobile? Vicki boomerang oracle rupert maxie hatter ventriloquist freeze basil batcave manor clench! Wayne cluemaster fright dick raatko cobblepot superman smoke a lex, bennett of. Fox prey gearhead, justice lazarus. Freeze raatko bat mad atomic knight firefly chase? Cypher scorn beetle atkins deathstroke tally barbara grayson clench, fright gordon lillian. Knight bullock maxie gotham gearhead zeus! Aiko clench blink.
-        </p>
-        <p>
-        Killer ghul moth hammer gargoyle chase bane damian deathstroke gotham charlatan solomon? Two tumbler justice aquaman; dick batman shadow shade mask robin jester joker snake. Batcave flash bruce fright, night ra collector vicki fairchild echo chill. Snake firebug prey carmine oracle fairchild. Batcave czonk zucco toymaker helena batman martha lantern deathstroke birds vicki tim. Ghul edward swamp spoiler. Creeper al dick nigma, justice abdullah scorn blink ivy.
-        </p>
+        <div class="readmore"><a href="#" class="readmore-link" data-id="<?php echo $key; ?>">Mehr lesen...</a></div>
+        <h5><?php echo $datumTag; ?></h5>
+        <h6><?php echo $datumMonat." ".$datumJahr; ?></h6>
+        <ul>
+            <li><i class="fa fa-eye fa-2x"></i></li>
+            <li><i class="fa fa-heart-o fa-2x"></i></li>
+            <li><i class="fa fa-envelope-o fa-2x"></i></li>
+            <li><i class="fa fa-share-alt fa-2x"></i></li>
+        </ul>
     </div>
 </div>
-<div class="blogEntry">
-    <div class="blogHeader">Design Vorlage</div>
-    <div class="blogTime"><?php echo $txtDatumZeit ?></div>
-    <hr>
-    <div class="entryBody">
-        
-        -Lorem Ipsum-
+<?php endforeach; ?>
+<script>
+    $(document).ready(function(){
+        $(".blogEntryFull").hide();
+        $(".shadow").hide();
 
-        <p>
-        Bartok charlatan master boomerang hatter alfred nigma shrike clock temblor. Diamond the gargoyle killer. Raatko snake solomon blake chimera gearhead. Fright poison shrike amanda ragdoll kobra firefly tumbler diamond young blink. Toymaker diamond clench blink atomic diamond luthor. Checkmate grey kobra phantom ali scarecrow rupert ghul shadow. Abbott hood pit robin alfred grayson jester shiva carmine rose chill hammer. Caird shiva barrow gotham america spoiler! League birds echo jason doom quinn manor smoke tumbler jason abbott dent. Clench lillian fox atkins bruce black batcave zeus tim temblor maxie zeus rupert. Lazarus aquaman abattoir zucco mad harlequin. Bennett bullock diamond.
-        </p>
-        <p>
-        Supergirl raatko scorn charlatan clayface maxie grundy jason young alfred rhino wing oswald. Smoke doom gotham gleeson atom harvey blink wing gleeson temblor chase vicki. Moth basil arrow fairchild. Damian todd scorn batarang charlatan batmobile. Huntress spectre jester knight vale ragman. Snake scarecrow echo lucius blake bat atom oracle. Chill gleeson birds bennett carmine hammer collector huntress barbara. Elongated poison blink dent vale bennett. Tim chimera, vicki ragdoll. Arrow drake face barrow moth hugo tally damian justice harley. Cain bruce zeus hammer hush charlatan. A outsider diamond a dent hatter jester caird.
-        </p>
-        <p>
-        Batgirl joe batarang vicki bruce, manor doom riddler batmobile catwoman blake poison canary. Jason strange quinn blue. Diamond scarecrow hammer cobblepot azrael calendar a kane thorne batarang copperhead red. Maroni temblor thorne maroni, batman nigma. A lantern moth charlatan shadow abdullah clayface prey carmine copperhead knight phantom. Collector helena collector abbott vicki dent nyssa edward barrow. Killer firefly harley lynx. Superman atomic jim checkmate wayne prey blue outsider martha kobra pit. Cypher america ventriloquist batgirl aiko bullock deadshot gotham kobra shiva master hangman. Todd phantom.
-        </p>
-        <p>
-        Atomic gleeson diamond face falcone calendar, flash batmobile? Vicki boomerang oracle rupert maxie hatter ventriloquist freeze basil batcave manor clench! Wayne cluemaster fright dick raatko cobblepot superman smoke a lex, bennett of. Fox prey gearhead, justice lazarus. Freeze raatko bat mad atomic knight firefly chase? Cypher scorn beetle atkins deathstroke tally barbara grayson clench, fright gordon lillian. Knight bullock maxie gotham gearhead zeus! Aiko clench blink.
-        </p>
-        <p>
-        Killer ghul moth hammer gargoyle chase bane damian deathstroke gotham charlatan solomon? Two tumbler justice aquaman; dick batman shadow shade mask robin jester joker snake. Batcave flash bruce fright, night ra collector vicki fairchild echo chill. Snake firebug prey carmine oracle fairchild. Batcave czonk zucco toymaker helena batman martha lantern deathstroke birds vicki tim. Ghul edward swamp spoiler. Creeper al dick nigma, justice abdullah scorn blink ivy.
-        </p>
-    </div>
-</div>
-</div>
+        $(".readmore-link").click(function(e){
+            e.preventDefault();
+            var idNo = $(this).data('id');
+            $("#bE_" + idNo).show();
+            $(".shadow").show();
+            $(this).hide();
+        });
+
+        $(".closeEntry a").click(function(e){
+            e.preventDefault();
+            $(this).parent().parent().hide();
+            $(".readmore-link").show();
+            $(".shadow").hide();
+        });
+
+    });
+</script>
+<?php include('footer.php'); ?>
